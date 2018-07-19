@@ -1,3 +1,4 @@
+package io.adhara.actfx;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +13,7 @@ import java.util.Properties;
 
 import org.apache.commons.codec.DecoderException;
 
-class ArthikaHFTListenerImp12 implements ArthikaHFTListener {
+class AdharaHFTListenerImp12 implements AdharaHFTListener {
 
 	@Override
 	public void timestampEvent(String timestamp) {
@@ -30,8 +31,8 @@ class ArthikaHFTListenerImp12 implements ArthikaHFTListener {
 	}
 
 	@Override
-	public void priceEvent(List<ArthikaHFT.priceTick> priceTickList) {
-		for (ArthikaHFT.priceTick tick : priceTickList){
+	public void priceEvent(List<AdharaHFT.priceTick> priceTickList) {
+		for (AdharaHFT.priceTick tick : priceTickList){
 			System.out.println("Security: " + tick.security + " Price: " + String.format("%." + tick.pips + "f", tick.price) + " Side: " + tick.side + " TI: " + tick.tinterface + " Liquidity: " + tick.liquidity);
 			if (tick.side.equals("ask")){
 				if (tick.tinterface.equals(Example12.tinterface2)){
@@ -59,26 +60,26 @@ class ArthikaHFTListenerImp12 implements ArthikaHFTListener {
 	}
 	
 	@Override
-    public void accountingEvent(ArthikaHFT.accountingTick accountingTick) {
+    public void accountingEvent(AdharaHFT.accountingTick accountingTick) {
 		System.out.println("StrategyPL: " + accountingTick.strategyPL + " TotalEquity: " + accountingTick.totalequity + " UsedMargin: " + accountingTick.usedmargin + " FreeMargin: " + accountingTick.freemargin);
     }
 
 	@Override
-	public void assetPositionEvent(List<ArthikaHFT.assetPositionTick> assetPositionTickList) {
-		for (ArthikaHFT.assetPositionTick tick : assetPositionTickList){
+	public void assetPositionEvent(List<AdharaHFT.assetPositionTick> assetPositionTickList) {
+		for (AdharaHFT.assetPositionTick tick : assetPositionTickList){
 			System.out.println("Asset: " + tick.asset + " Account: " + tick.account + " Exposure: " + tick.exposure + " TotalRisk: " + tick.totalrisk);
 		}
 	}
 
 	@Override
-	public void securityPositionEvent(List<ArthikaHFT.securityPositionTick> securityPositionTickList) {
-		for (ArthikaHFT.securityPositionTick tick : securityPositionTickList){
+	public void securityPositionEvent(List<AdharaHFT.securityPositionTick> securityPositionTickList) {
+		for (AdharaHFT.securityPositionTick tick : securityPositionTickList){
 			System.out.println("Security: " + tick.security + " Account: " + tick.account + " Equity: " + tick.equity + " Exposure: " + tick.exposure + " Price: " + tick.price + " Pips: " + tick.pips);
 		}
 	}
 
 	@Override
-	public void positionHeartbeatEvent(ArthikaHFT.positionHeartbeat positionHeartbeatList) {
+	public void positionHeartbeatEvent(AdharaHFT.positionHeartbeat positionHeartbeatList) {
 		System.out.print("Asset: " );
 		for (int i=0; i<positionHeartbeatList.asset.size(); i++){
 			System.out.print(positionHeartbeatList.asset.get(i));
@@ -104,14 +105,14 @@ class ArthikaHFTListenerImp12 implements ArthikaHFTListener {
 	}
 
 	@Override
-	public void orderEvent(List<ArthikaHFT.orderTick> orderTickList) {
-		for (ArthikaHFT.orderTick tick : orderTickList){
+	public void orderEvent(List<AdharaHFT.orderTick> orderTickList) {
+		for (AdharaHFT.orderTick tick : orderTickList){
 			System.out.println("TempId: " + tick.tempid + " OrderId: " + tick.orderid + " Security: " + tick.security + " Account: " + tick.account + " Quantity: " + tick.quantity + " Type: " + tick.type + " Side: " + tick.side + " Status: " + tick.status);
 		}
 	}
 
 	@Override
-	public void orderHeartbeatEvent(ArthikaHFT.orderHeartbeat orderHeartbeat) {
+	public void orderHeartbeatEvent(AdharaHFT.orderHeartbeat orderHeartbeat) {
 		System.out.print("Security: " );
 		for (int i=0; i<orderHeartbeat.security.size(); i++){
 			System.out.print(orderHeartbeat.security.get(i));
@@ -133,7 +134,7 @@ class ArthikaHFTListenerImp12 implements ArthikaHFTListener {
 public class Example12 {
 	
 	private static final boolean ssl = true;
-	private static ArthikaHFT wrapper;
+	private static AdharaHFT wrapper;
 	private static String domain;
 	private static String url_stream;
 	private static String url_polling;
@@ -171,14 +172,14 @@ public class Example12 {
 		// get properties from file
     	getProperties();
 
-    	wrapper = new ArthikaHFT(domain, url_stream, url_polling, url_challenge, url_token, user, password, authentication_port, request_port, ssl, ssl_cert);
+    	wrapper = new AdharaHFT(domain, url_stream, url_polling, url_challenge, url_token, user, password, authentication_port, request_port, ssl, ssl_cert);
 		
 		wrapper.doAuthentication();
 		
 		// STRATEGY
 		
 		// get tinterfaces
-		List<ArthikaHFT.tinterfaceTick> tinterfaceTickList = wrapper.getInterface();
+		List<AdharaHFT.tinterfaceTick> tinterfaceTickList = wrapper.getInterface();
 		tinterface1 = tinterfaceTickList.get(0).name;
 		if (tinterfaceTickList.size()>1){
 			tinterface2 = tinterfaceTickList.get(1).name;
@@ -194,7 +195,7 @@ public class Example12 {
 		}
 
 		// Open price streaming
-		long id1 = wrapper.getPriceBegin(Arrays.asList("EUR/USD"), tinterfacelist, ArthikaHFT.GRANULARITY_TOB, 1, interval, new ArthikaHFTListenerImp12());
+		long id1 = wrapper.getPriceBegin(Arrays.asList("EUR/USD"), tinterfacelist, AdharaHFT.GRANULARITY_TOB, 1, interval, new AdharaHFTListenerImp12());
 		Thread.sleep(20000);
 
 		// Close price streaming
@@ -243,8 +244,8 @@ public class Example12 {
 	
 	public static void checkPrices(){
 		if ((bestcanask<bestbaxbid && bestcanask>0.0) || (bestbaxask<bestcanbid && bestbaxask>0.0)){
-			ArthikaHFT.orderRequest orderask = new ArthikaHFT.orderRequest();
-			ArthikaHFT.orderRequest orderbid = new ArthikaHFT.orderRequest();
+			AdharaHFT.orderRequest orderask = new AdharaHFT.orderRequest();
+			AdharaHFT.orderRequest orderbid = new AdharaHFT.orderRequest();
 			int quantity = 0;
 			if (bestcanask<bestbaxbid && bestcanask>0.0){
 				quantity = bestcanaskliquidity;
@@ -269,19 +270,19 @@ public class Example12 {
 			
 			orderask.security = "EUR/USD";
 			orderask.quantity = quantity;
-			orderask.side = ArthikaHFT.SIDE_BUY;
-			orderask.type = ArthikaHFT.TYPE_LIMIT;
-			orderask.timeinforce = ArthikaHFT.VALIDITY_DAY;
+			orderask.side = AdharaHFT.SIDE_BUY;
+			orderask.type = AdharaHFT.TYPE_LIMIT;
+			orderask.timeinforce = AdharaHFT.VALIDITY_DAY;
 			
 			orderbid.security = "EUR/USD";
 			orderbid.quantity = quantity;
-			orderbid.side = ArthikaHFT.SIDE_SELL;
-			orderbid.type = ArthikaHFT.TYPE_LIMIT;
-			orderbid.timeinforce = ArthikaHFT.VALIDITY_DAY;
+			orderbid.side = AdharaHFT.SIDE_SELL;
+			orderbid.type = AdharaHFT.TYPE_LIMIT;
+			orderbid.timeinforce = AdharaHFT.VALIDITY_DAY;
 			
 			try{
-				List<ArthikaHFT.orderRequest> orderList1 = wrapper.setOrder(Arrays.asList(orderask, orderbid));
-				for (ArthikaHFT.orderRequest orderresponse : orderList1){
+				List<AdharaHFT.orderRequest> orderList1 = wrapper.setOrder(Arrays.asList(orderask, orderbid));
+				for (AdharaHFT.orderRequest orderresponse : orderList1){
 					System.out.println("Id: " + orderresponse.tempid + " Security: " + orderresponse.security + " Side: " + orderresponse.side + " Quantity: " + orderresponse.quantity + " Price: " + orderresponse.price + " Type: " + orderresponse.type);
 				}
 			} catch (Exception e) {

@@ -1,3 +1,4 @@
+package io.adhara.actfx;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -5,17 +6,14 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.codec.DecoderException;
 
-class ArthikaHFTListenerImp10 implements ArthikaHFTListener {
-	
-	public Map<Integer, String> fixidMap = new HashMap<Integer, String>();
+class AdharaHFTListenerImp1 implements AdharaHFTListener {
 
 	@Override
 	public void timestampEvent(String timestamp) {
@@ -33,33 +31,33 @@ class ArthikaHFTListenerImp10 implements ArthikaHFTListener {
 	}
 
 	@Override
-	public void priceEvent(List<ArthikaHFT.priceTick> priceTickList) {
-		for (ArthikaHFT.priceTick tick : priceTickList){
+	public void priceEvent(List<AdharaHFT.priceTick> priceTickList) {
+		for (AdharaHFT.priceTick tick : priceTickList){
 			System.out.println("Security: " + tick.security + " Price: " + String.format("%." + tick.pips + "f", tick.price) + " Side: " + tick.side + " TI: " + tick.tinterface + " Liquidity: " + tick.liquidity);
 		}
 	}
 	
 	@Override
-    public void accountingEvent(ArthikaHFT.accountingTick accountingTick) {
+    public void accountingEvent(AdharaHFT.accountingTick accountingTick) {
 		System.out.println("StrategyPL: " + accountingTick.strategyPL + " TotalEquity: " + accountingTick.totalequity + " UsedMargin: " + accountingTick.usedmargin + " FreeMargin: " + accountingTick.freemargin);
     }
 
 	@Override
-	public void assetPositionEvent(List<ArthikaHFT.assetPositionTick> assetPositionTickList) {
-		for (ArthikaHFT.assetPositionTick tick : assetPositionTickList){
+	public void assetPositionEvent(List<AdharaHFT.assetPositionTick> assetPositionTickList) {
+		for (AdharaHFT.assetPositionTick tick : assetPositionTickList){
 			System.out.println("Asset: " + tick.asset + " Account: " + tick.account + " Exposure: " + tick.exposure + " TotalRisk: " + tick.totalrisk);
 		}
 	}
 
 	@Override
-	public void securityPositionEvent(List<ArthikaHFT.securityPositionTick> securityPositionTickList) {
-		for (ArthikaHFT.securityPositionTick tick : securityPositionTickList){
+	public void securityPositionEvent(List<AdharaHFT.securityPositionTick> securityPositionTickList) {
+		for (AdharaHFT.securityPositionTick tick : securityPositionTickList){
 			System.out.println("Security: " + tick.security + " Account: " + tick.account + " Equity: " + tick.equity + " Exposure: " + tick.exposure + " Price: " + tick.price + " Pips: " + tick.pips);
 		}
 	}
 
 	@Override
-	public void positionHeartbeatEvent(ArthikaHFT.positionHeartbeat positionHeartbeatList) {
+	public void positionHeartbeatEvent(AdharaHFT.positionHeartbeat positionHeartbeatList) {
 		System.out.print("Asset: " );
 		for (int i=0; i<positionHeartbeatList.asset.size(); i++){
 			System.out.print(positionHeartbeatList.asset.get(i));
@@ -85,15 +83,14 @@ class ArthikaHFTListenerImp10 implements ArthikaHFTListener {
 	}
 
 	@Override
-	public void orderEvent(List<ArthikaHFT.orderTick> orderTickList) {
-		for (ArthikaHFT.orderTick tick : orderTickList){
+	public void orderEvent(List<AdharaHFT.orderTick> orderTickList) {
+		for (AdharaHFT.orderTick tick : orderTickList){
 			System.out.println("TempId: " + tick.tempid + " OrderId: " + tick.orderid + " Security: " + tick.security + " Account: " + tick.account + " Quantity: " + tick.quantity + " Type: " + tick.type + " Side: " + tick.side + " Status: " + tick.status);
-			fixidMap.put(tick.tempid, tick.fixid);
 		}
 	}
 
 	@Override
-	public void orderHeartbeatEvent(ArthikaHFT.orderHeartbeat orderHeartbeat) {
+	public void orderHeartbeatEvent(AdharaHFT.orderHeartbeat orderHeartbeat) {
 		System.out.print("Security: " );
 		for (int i=0; i<orderHeartbeat.security.size(); i++){
 			System.out.print(orderHeartbeat.security.get(i));
@@ -112,10 +109,10 @@ class ArthikaHFTListenerImp10 implements ArthikaHFTListener {
 	}    
 }
 
-public class Example10 {
+public class Example1 {
 	
-	private static final boolean ssl = true;
-	private static ArthikaHFT wrapper;
+	private static final boolean ssl = false;
+	private static AdharaHFT wrapper;
 	private static String domain;
 	private static String url_stream;
 	private static String url_polling;
@@ -128,7 +125,7 @@ public class Example10 {
 	private static String ssl_cert;
 	private static int interval;
 	
-	public Example10(){
+	public Example1(){
 		
 	}
 	
@@ -137,58 +134,47 @@ public class Example10 {
 		// get properties from file
     	getProperties();
 
-    	wrapper = new ArthikaHFT(domain, url_stream, url_polling, url_challenge, url_token, user, password, authentication_port, request_port, ssl, ssl_cert);
+		wrapper = new AdharaHFT(domain, url_stream, url_polling, url_challenge, url_token, user, password, authentication_port, request_port, ssl, ssl_cert);
 		
 		wrapper.doAuthentication();
 		
-		// CANCEL PENDING ORDER WITH ORDER STREAMING
+		// PRICE STREAMING
 		
 		// get tinterfaces
-		List<ArthikaHFT.tinterfaceTick> tinterfaceTickList = wrapper.getInterface();
-		String tinterface1 = tinterfaceTickList.get(0).name;
-
-		// Open order streaming
-		ArthikaHFTListenerImp10 listener = new ArthikaHFTListenerImp10();
-		long id1 = wrapper.getOrderBegin(null, null, null, interval, listener);
+		List<AdharaHFT.tinterfaceTick> tinterfaceTickList = wrapper.getInterface();
+		
+		// Open first price streaming for one security in all tinterfaces
+		long id1 = wrapper.getPriceBegin(Arrays.asList("GBP/USD"), null, AdharaHFT.GRANULARITY_TOB, 1, interval, new AdharaHFTListenerImp1());
 		Thread.sleep(5000);
 		
-		// get current price
-        double price = 0.0;
-        List<ArthikaHFT.priceTick> priceTickList1 = wrapper.getPrice(Arrays.asList("EUR/USD"), Arrays.asList(tinterface1), ArthikaHFT.GRANULARITY_TOB, 1);
-        for (ArthikaHFT.priceTick tick : priceTickList1)
-        {
-            price = tick.price;
-        }
-		
-		// Create pending order. If buy, order price must be lower than current price
-		ArthikaHFT.orderRequest order1 = new ArthikaHFT.orderRequest();
-		order1.security = "EUR/USD";
-		order1.tinterface = tinterface1;
-		order1.quantity = 500000;
-		order1.side = ArthikaHFT.SIDE_BUY;
-		order1.type = ArthikaHFT.TYPE_LIMIT;
-		order1.timeinforce = ArthikaHFT.VALIDITY_DAY;
-		order1.price = price - 0.01;
-		List<ArthikaHFT.orderRequest> orderList = wrapper.setOrder(Arrays.asList(order1));
-		int tempid = -1;
-		for (ArthikaHFT.orderRequest orderresponse : orderList){
-			System.out.println("Id: " + orderresponse.tempid + " Security: " + orderresponse.security + " Side: " + orderresponse.side + " Quantity: " + orderresponse.quantity + " Price: " + orderresponse.price + " Type: " + orderresponse.type);
-			tempid = orderresponse.tempid;
+		// Open second price streaming for two securities in the two first tinterfaces
+		List<String> tinterfacelist = null;
+		if (tinterfaceTickList!=null && tinterfaceTickList.size()>1){
+			tinterfacelist = new ArrayList<String>();
+			tinterfacelist.add(tinterfaceTickList.get(0).name);
+			tinterfacelist.add(tinterfaceTickList.get(1).name);
 		}
+		long id2 = wrapper.getPriceBegin(Arrays.asList("EUR/USD", "GBP/JPY"), tinterfacelist, AdharaHFT.GRANULARITY_FAB, 2, interval, new AdharaHFTListenerImp1());
 		Thread.sleep(5000);
 		
-		// Cancel pending order
-		System.out.println("Cancel order");
-		String fixid = listener.fixidMap.get(tempid);
-		List<ArthikaHFT.cancelTick> cancelList = wrapper.cancelOrder(Arrays.asList(fixid));
-		for (ArthikaHFT.cancelTick cancelresponse : cancelList){
-			System.out.println("FixId: " + cancelresponse.fixid + " Result: " + cancelresponse.result);
+		// Close second price streaming
+		wrapper.getPriceEnd(id2);
+		Thread.sleep(5000);
+		
+		// Close first price streaming
+		wrapper.getPriceEnd(id1);
+		Thread.sleep(5000);
+		
+		// Open third price streaming for six securities in the first tinterface
+		if (tinterfaceTickList!=null && !tinterfaceTickList.isEmpty()){
+			tinterfacelist = new ArrayList<String>();
+			tinterfacelist.add(tinterfaceTickList.get(0).name);
 		}
-		System.out.println("Order canceled");
-		Thread.sleep(2000);
-
-		// Close order streaming
-		wrapper.getOrderEnd(id1);
+		long id3 = wrapper.getPriceBegin(Arrays.asList("EUR/USD", "EUR/GBP", "EUR/JPY", "GBP/JPY", "GBP/USD", "USD/JPY"), tinterfacelist, AdharaHFT.GRANULARITY_TOB, 1, interval, new AdharaHFTListenerImp1());
+		Thread.sleep(5000);
+		
+		// Close third price streaming
+		wrapper.getPriceEnd(id3);
 	}
 	
 	public static void getProperties(){

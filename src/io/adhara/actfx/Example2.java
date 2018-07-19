@@ -1,3 +1,4 @@
+package io.adhara.actfx;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +16,7 @@ import org.apache.commons.codec.DecoderException;
 public class Example2 {
 	
 	private static final boolean ssl = true;
-	private static ArthikaHFT wrapper;
+	private static AdharaHFT wrapper;
 	private static String domain;
 	private static String url_stream;
 	private static String url_polling;
@@ -36,14 +37,14 @@ public class Example2 {
 		// get properties from file
     	getProperties();
 
-    	wrapper = new ArthikaHFT(domain, url_stream, url_polling, url_challenge, url_token, user, password, authentication_port, request_port, ssl, ssl_cert);
+    	wrapper = new AdharaHFT(domain, url_stream, url_polling, url_challenge, url_token, user, password, authentication_port, request_port, ssl, ssl_cert);
 		
 		wrapper.doAuthentication();
 
 		// PRICE POLLING
 		
 		// get tinterfaces
-		List<ArthikaHFT.tinterfaceTick> tinterfaceTickList = wrapper.getInterface();
+		List<AdharaHFT.tinterfaceTick> tinterfaceTickList = wrapper.getInterface();
 		
 		System.out.println("Starting Polling1");
 		List<String> tinterfacelist = null;
@@ -51,15 +52,15 @@ public class Example2 {
 			tinterfacelist = new ArrayList<String>();
 			tinterfacelist.add(tinterfaceTickList.get(1).name);
 		}
-		List<ArthikaHFT.priceTick> priceTickList1 = wrapper.getPrice(Arrays.asList("EUR/USD", "EUR/GBP", "EUR/JPY", "GBP/JPY", "GBP/USD", "USD/JPY"), tinterfacelist, ArthikaHFT.GRANULARITY_TOB, 1);
-		for (ArthikaHFT.priceTick tick : priceTickList1){
+		List<AdharaHFT.priceTick> priceTickList1 = wrapper.getPrice(Arrays.asList("EUR/USD", "EUR/GBP", "EUR/JPY", "GBP/JPY", "GBP/USD", "USD/JPY"), tinterfacelist, AdharaHFT.GRANULARITY_TOB, 1);
+		for (AdharaHFT.priceTick tick : priceTickList1){
 			System.out.println("Security: " + tick.security + " Price: " + String.format("%." + tick.pips + "f", tick.price) + " Side: " + tick.side + " TI: " + tick.tinterface + " Liquidity: " + tick.liquidity);
 		}
 		System.out.println("Polling1 Finished");
 		
 		System.out.println("Starting Polling2");
-		List<ArthikaHFT.priceTick> priceTickList2 = wrapper.getPrice(Arrays.asList("EUR/USD"), null, ArthikaHFT.GRANULARITY_FAB, 4);
-		for (ArthikaHFT.priceTick tick : priceTickList2){
+		List<AdharaHFT.priceTick> priceTickList2 = wrapper.getPrice(Arrays.asList("EUR/USD"), null, AdharaHFT.GRANULARITY_FAB, 4);
+		for (AdharaHFT.priceTick tick : priceTickList2){
 			System.out.println("Security: " + tick.security + " Price: " + String.format("%." + tick.pips + "f", tick.price) + " Side: " + tick.side + " TI: " + tick.tinterface + " Liquidity: " + tick.liquidity);
 		}
 		System.out.println("Polling2 Finished");
